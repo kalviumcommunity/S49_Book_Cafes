@@ -4,7 +4,7 @@ Book Cafes
 
 ## Idea
 
-This will help all the Bibliophiles out there with an cozy place to speand their time and come out with an insightful knowlwdge.
+This will help all the Bibliophiles out there with an cozy place to speand their  time and come out with an insightful knowlwdge.
 
 ## Features
 
