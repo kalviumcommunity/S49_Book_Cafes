@@ -1,8 +1,8 @@
-# Title
+## Title
 
 Book Cafes
 
-# Idea
+## Idea
 
 This will help all the Bibliophiles out there with an cozy place to speand their time and come out with an insightful knowlwdge.
 
