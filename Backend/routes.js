@@ -15,7 +15,7 @@ let data = [
     cafeName: "brewbooks2",
     loc: "Indiranagar2",
     type: "asthetic2",
-    ratings: 4.8,
+    ratings: 4.7,
   },
   {
     id: 3,
