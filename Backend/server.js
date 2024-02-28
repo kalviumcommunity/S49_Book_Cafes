@@ -2,17 +2,23 @@ const express = require('express');
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser'); // middleware for parsing request bodies
 const app = express();
+const cors = require('cors')
 require('dotenv').config()
+app.use(cors())
+
+const CafeModel = require('./models/CafeData.js')
 
 // Import CRUD routes
 const router = require('./routes.js');
 
 // Middleware for parsing request bodies
-app.use(bodyParser.json());
-
-app.use("/common",router)
+app.use(express.json())
+app.use("/common", router)
 
 // Connect to MongoDB
+
+
+
 const startDatabase = async() =>{
   try{
     await mongoose.connect(process.env.API_LINK, {
@@ -38,15 +44,13 @@ const isConnected = () => {
   return mongoose.connection.readyState === 1;
 };
 
-app.get('/', (req, res) => {
-  res.json({
-    message: 'o_O',
-    database: isConnected() ? 'connected' : 'disconnected'
-  });
+app.get('/cafeList', async (req, res) => {
+  let x = await CafeModel.find()
+  res.send(x);
 });
 
 //handle shutdown signals
-const port = process.env.PUBLIC_PORT ?? 3000;
+const port = 3000;
 
 process.on('SIGINT', async () => {
   await stopDatabase();
