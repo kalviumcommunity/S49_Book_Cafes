@@ -1,5 +1,6 @@
 import './App.css'
 import Home from './components/Home'
+import UserInputForm from './components/From'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
@@ -15,7 +16,10 @@ function App() {
 
   return (
     <>
+      <UserInputForm/>
+      <hr />
       <Home/>
+      <hr />
       <div>{data && data.map((data)=>{
         return(
           <div className="main" key={data.id}>
