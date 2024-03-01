@@ -7,6 +7,7 @@ require('dotenv').config()
 app.use(cors())
 
 const CafeModel = require('./models/CafeData.js')
+const UserInputModel = require('./models/UserInputData.js')
 
 // Import CRUD routes
 const router = require('./routes.js');
@@ -49,25 +50,50 @@ app.get('/cafeList', async (req, res) => {
   res.send(x);
 });
 
+//Getting and updating the data from the api after the user inputs the information given in the form page.
+app.get('/userData', async (req, res)=>{
+    try{
+      const userEntity = await UserInputModel.find()
+      res.send(userEntity)
+    }catch (error) {
+      console.error("Error fetching entity list:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  })
+
+  
+  app.post(async (req, res) => {
+    const { name, email, favBook } = req.body;
+    const newEntity = new UserInputModel({ name, email, favBook });
+
+    try {
+      const savedEntity = await newEntity.save();
+      res.json(savedEntity);
+    } catch (error) {
+      console.error("Error adding entity:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
 //handle shutdown signals
-const port = 3000;
+// const port = 3000;
 
-process.on('SIGINT', async () => {
-  await stopDatabase();
-  process.exit(0);
-});
+// process.on('SIGINT', async () => {
+//   await stopDatabase();
+//   process.exit(0);
+// });
 
-process.on('SIGTERM', async () => {
-  await stopDatabase();
-  process.exit(0);
-});
+// process.on('SIGTERM', async () => {
+//   await stopDatabase();
+//   process.exit(0);
+// });
 
 //start server
-if (require.main === module) {
-  app.listen(port, async () => {
+
+  app.listen(3000, async () => {
     await startDatabase();
     console.log(`🚀 Server running on PORT: ${port}`);
-  });
-}
+  })
+
 
 module.exports = app
