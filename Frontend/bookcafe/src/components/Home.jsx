@@ -7,14 +7,16 @@ function Home() {
 
   return (
     <div>
-        <div>{dummydata.map((item)=>{
-        return <div>
-          <h1>{item.id}</h1>
-          <h1>{item.cafeName}</h1>
-          <h3>{item.loc}</h3>
-          <h4>{item.type}</h4>
-          <h4>{item.ratings}</h4>
+        <div>{dummydata.map((data)=>{
+        return(
+          <div className="main" key={data.id}>
+            <h3>{data.id}</h3>
+            <h3>{data.cafeName}</h3>
+            <h3>{data.loc}</h3>
+            <h3>{data.type}</h3>
+            <h3>{data.ratings}</h3>
           </div>
+        )
         })}</div>
     </div>
   )

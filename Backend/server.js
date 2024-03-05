@@ -62,7 +62,7 @@ app.get('/userData', async (req, res)=>{
   })
 
   
-  app.post(async (req, res) => {
+  app.post('/userData', async (req, res) => {
     const { name, email, favBook } = req.body;
     const newEntity = new UserInputModel({ name, email, favBook });
 
@@ -92,7 +92,7 @@ app.get('/userData', async (req, res)=>{
 
   app.listen(3000, async () => {
     await startDatabase();
-    console.log(`🚀 Server running on PORT: ${port}`);
+    console.log('🚀 Server running on PORT: 3000');
   })
 
 
