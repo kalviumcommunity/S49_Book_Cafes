@@ -1,0 +1,48 @@
+/* body{
+    background-color: #8C888A;
+  }
+  
+  .main{
+    background-color: #FDFBFD;
+    width: max-content;
+    padding: 2vw;
+    position: absolute;
+    left: 35%;
+    top: 12%;
+  }
+  
+  .input-element input{
+    padding: 1vw;
+    background-color: #EEECEE;
+    color: black;
+    width: 25vw;
+    border: none;
+  }
+  
+  .input-element{
+    margin-top: 20px;
+  }
+  
+  .registerbtn{
+    text-align: center;
+  }
+  
+  .register{
+    width: 27vw;
+    padding: 1vw;
+    color: white;
+    background-color: #41A445;
+  }
+  
+  .error-msg{
+    color: red;
+  }
+  
+  .success{
+    color: white;
+    background-color: rgb(79, 189, 226);
+    padding: 1vw;
+    font-size: 1rem;
+  }
+  
+   */

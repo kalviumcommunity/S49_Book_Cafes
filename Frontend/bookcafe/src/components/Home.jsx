@@ -1,5 +1,6 @@
 import React from 'react'
 import dummydata from './dummydata.json'
+import UserInputForm from './From'
 
 function Home() {
 
@@ -7,6 +8,7 @@ function Home() {
 
   return (
     <div>
+      <UserInputForm/>
         <div>{dummydata.map((data)=>{
         return(
           <div className="main" key={data.id}>

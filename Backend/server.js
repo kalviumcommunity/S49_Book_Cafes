@@ -75,19 +75,6 @@ app.get('/userData', async (req, res)=>{
     }
   });
 
-//handle shutdown signals
-// const port = 3000;
-
-// process.on('SIGINT', async () => {
-//   await stopDatabase();
-//   process.exit(0);
-// });
-
-// process.on('SIGTERM', async () => {
-//   await stopDatabase();
-//   process.exit(0);
-// });
-
 //start server
 
   app.listen(3000, async () => {
