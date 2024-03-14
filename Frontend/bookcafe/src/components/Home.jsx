@@ -1,6 +1,5 @@
 import React from 'react'
 import dummydata from './dummydata.json'
-import UserInputForm from './From'
 
 function Home() {
 
@@ -8,10 +7,9 @@ function Home() {
 
   return (
     <div>
-      <UserInputForm/>
         <div>{dummydata.map((data)=>{
         return(
-          <div className="main" key={data.id}>
+          <div className="diff" key={data.id}>
             <h3>{data.id}</h3>
             <h3>{data.cafeName}</h3>
             <h3>{data.loc}</h3>

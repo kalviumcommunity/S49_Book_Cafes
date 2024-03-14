@@ -3,8 +3,10 @@ import axios from 'axios';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
-import UserInputForm from './components/From';
 import Form from './components/Form';
+import Review from './components/Review';
+import Favourites from './components/Favourites';
+import UpdateEntity from './components/UpdateEntity';
 
 function App() {
   let [data, setData] = useState();
@@ -12,20 +14,23 @@ function App() {
   useEffect(() => {
     axios
       .get('http://localhost:3000/cafeList')
-      .then((res) => setData(res.data))
+      .then((res) =>setData(res.data))
       .catch((err) => console.error(err));
-  }, [data]);
+  }, []);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/form" element={<Form />} />
-        {/* Add more routes as needed */}
-      </Routes>
-
-      <Navbar />
-    </Router>
+    <div>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/form" element={<Form />} />
+          <Route path='/review' element={<Review/>}/>
+          <Route path='/favourites' element={<Favourites/>}/>
+          <Route path="/edit/:keyId" element={<UpdateEntity/>} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 

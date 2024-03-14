@@ -5,7 +5,7 @@ const CafeSchema = new mongoose.Schema({
     cafeName: String,
     loc: String,
     type: String,
-    ratings: String
+    ratings: String,
 })
 
 const CafeModel = mongoose.model("details", CafeSchema)
