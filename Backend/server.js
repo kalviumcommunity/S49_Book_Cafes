@@ -7,7 +7,7 @@ require('dotenv').config()
 app.use(cors())
 
 const CafeModel = require('./models/CafeData.js')
-const UserInputModel = require('./models/UserInputData.js')
+const UserReview = require('./models/UserReview.js')
 
 // Import CRUD routes
 const router = require('./routes.js');
@@ -17,9 +17,7 @@ app.use(express.json())
 app.use("/common", router)
 
 // Connect to MongoDB
-
-
-
+  //start database
 const startDatabase = async() =>{
   try{
     await mongoose.connect(process.env.API_LINK, {
@@ -32,6 +30,7 @@ const startDatabase = async() =>{
   }
 }
 
+  //stop database
 const stopDatabase = async() =>{
   try{
     await mongoose.disconnect()
@@ -41,6 +40,7 @@ const stopDatabase = async() =>{
   }
 }
 
+// check if database is connected and display message accordingly
 const isConnected = () => {
   return mongoose.connection.readyState === 1;
 };
@@ -50,49 +50,76 @@ app.get('/cafeList', async (req, res) => {
   res.send(x);
 });
 
+//
+
+
 //Getting and updating the data from the api after the user inputs the information given in the form page.
 app.get('/userData', async (req, res)=>{
     try{
-      const userEntity = await UserInputModel.find()
+      const userEntity = await UserReview.find()
       res.send(userEntity)
     }catch (error) {
       console.error("Error fetching entity list:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   })
-
   
-  app.post(async (req, res) => {
-    const { name, email, favBook } = req.body;
-    const newEntity = new UserInputModel({ name, email, favBook });
+app.post('/userData', async (req, res) => {
+  const { Cafename, Rating, Review } = req.body;
+  const newEntity = new UserReview({ Cafename, Rating, Review });
 
-    try {
-      const savedEntity = await newEntity.save();
-      res.json(savedEntity);
-    } catch (error) {
-      console.error("Error adding entity:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
+  try {
+    const savedEntity = await newEntity.save();
+    res.json(savedEntity);
+  } catch (error) {
+    console.error("Error adding entity:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
-//handle shutdown signals
-// const port = 3000;
+//Endpoint for delete operation to delete an entity by it's id
+app.delete('/userData/:id', async(req, res)=>{
+  try{
+    const {id} = req.params
+    await UserReview.findByIdAndDelete(id)
+    res.status(200).json({ message: 'Entry deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting entry:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
-// process.on('SIGINT', async () => {
-//   await stopDatabase();
-//   process.exit(0);
+// app.put('/userData/:id', async(req, res)=>{
+//   try{
+//     const {id} = req.params
+//     await UserReview.findByIdAndUpdate({_id:id},{})
+//     res.status(200).json({ message: 'Entry updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating entry:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
 // });
 
-// process.on('SIGTERM', async () => {
-//   await stopDatabase();
-//   process.exit(0);
-// });
+app.put('/userData/:id', async(req, res)=>{
+    let data=req.body;
+  try{
+    const {id} = req.params;
+    const updatedData = req.body; // Get updated data from request body
+    await UserReview.findByIdAndUpdate({_id:id}, {Cafename:data.Cafename,Rating:data.Rating,Review:data.Review}); // Update document with new data
+    res.status(200).json({ message: 'Entry updated successfully' });
+  } catch (error) {
+    console.error('Error updating entry:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 //start server
 
   app.listen(3000, async () => {
     await startDatabase();
-    console.log(`🚀 Server running on PORT: ${port}`);
+    console.log('🚀 Server running on PORT: 3000');
   })
 
 

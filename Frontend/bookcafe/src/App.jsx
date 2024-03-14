@@ -1,38 +1,37 @@
-import './App.css'
-import Home from './components/Home'
-import UserInputForm from './components/From'
-import { useEffect, useState } from 'react'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './components/Home';
+import Form from './components/Form';
+import Review from './components/Review';
+import Favourites from './components/Favourites';
+import UpdateEntity from './components/UpdateEntity';
 
 function App() {
+  let [data, setData] = useState();
 
-  let [data, setData] = useState()
-
-  useEffect(()=>{
-    axios.get('http://localhost:3000/cafeList')
-         .then(res => setData(res.data) )
-         .catch(err => console.error(err))
-  }, [data])
+  useEffect(() => {
+    axios
+      .get('http://localhost:3000/cafeList')
+      .then((res) =>setData(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
-    <>
-      <UserInputForm/>
-      <hr />
-      <Home/>
-      <hr />
-      <div>{data && data.map((data)=>{
-        return(
-          <div className="main" key={data.id}>
-            <h3>{data.id}</h3>
-            <h3>{data.cafeName}</h3>
-            <h3>{data.loc}</h3>
-            <h3>{data.type}</h3>
-            <h3>{data.ratings}</h3>
-          </div>
-        )
-      })}</div>
-    </>
-  )
+    <div>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/form" element={<Form />} />
+          <Route path='/review' element={<Review/>}/>
+          <Route path='/favourites' element={<Favourites/>}/>
+          <Route path="/edit/:keyId" element={<UpdateEntity/>} />
+        </Routes>
+      </Router>
+    </div>
+  );
 }
 
-export default App
+export default App;
