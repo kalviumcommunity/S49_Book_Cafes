@@ -36,11 +36,11 @@ function UpdateEntity() {
 
   const handleUpdate = async () => {
     try {
-      console.log(updatedData);
+      // console.log(updatedData);
       await axios.put(`http://localhost:3000/userData/${keyId}`, {Cafename:updatedData.Cafename,Rating:updatedData.Rating,Review:updatedData.Review});
       navigate("/favourites");
     } catch (err) {
-      console.log("Error", err);
+      console.error(err.response.data.error)
     }
   };
 

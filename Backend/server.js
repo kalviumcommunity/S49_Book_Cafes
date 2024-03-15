@@ -3,8 +3,15 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser'); // middleware for parsing request bodies
 const app = express();
 const cors = require('cors')
+const Joi = require('joi')
 require('dotenv').config()
-app.use(cors())
+app.use(cors({
+  origin: '*', // Allow requests from any origin (you may want to restrict this to your frontend origin in production)
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allowed HTTP methods
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+}));
+
 
 const CafeModel = require('./models/CafeData.js')
 const UserReview = require('./models/UserReview.js')
@@ -63,19 +70,35 @@ app.get('/userData', async (req, res)=>{
       res.status(500).json({ error: "Internal Server Error" });
     }
   })
-  
+
+//joi validation for the below post operation endpoint
+// app.use(express.json())
+const postSchema = Joi.object({
+    Cafename: Joi.string().required(),
+    Rating: Joi.number().required(),
+    Review: Joi.string().required()
+})
+
+//Endpoint for post operation to post an entity
 app.post('/userData', async (req, res) => {
+  const { error } = postSchema.validate(req.body, {abortEarly: false});
+  if (error) {
+    return res.status(400).json({ error: error.details.map((e) => e.message) });
+  }
+
   const { Cafename, Rating, Review } = req.body;
   const newEntity = new UserReview({ Cafename, Rating, Review });
-
   try {
     const savedEntity = await newEntity.save();
-    res.json(savedEntity);
+    return res.json(savedEntity);
   } catch (error) {
     console.error("Error adding entity:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
 
 //Endpoint for delete operation to delete an entity by it's id
 app.delete('/userData/:id', async(req, res)=>{
@@ -89,31 +112,31 @@ app.delete('/userData/:id', async(req, res)=>{
   }
 });
 
-// app.put('/userData/:id', async(req, res)=>{
-//   try{
-//     const {id} = req.params
-//     await UserReview.findByIdAndUpdate({_id:id},{})
-//     res.status(200).json({ message: 'Entry updated successfully' });
-//   } catch (error) {
-//     console.error('Error updating entry:', error);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// });
+//joi validation for the below put operation endpoint
+const updateSchema = Joi.object({
+  Cafename: Joi.string().required(),
+  Rating: Joi.number().required(),
+  Review: Joi.string().required()
+})
 
+//Endpoint for put operation to update an entity by it's id
 app.put('/userData/:id', async(req, res)=>{
-    let data=req.body;
+  const { error } = updateSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    return res.status(400).json({ error: error.details.map((e) => e.message) });
+  }
+
+  let data=req.body;
   try{
     const {id} = req.params;
     const updatedData = req.body; // Get updated data from request body
     await UserReview.findByIdAndUpdate({_id:id}, {Cafename:data.Cafename,Rating:data.Rating,Review:data.Review}); // Update document with new data
-    res.status(200).json({ message: 'Entry updated successfully' });
+    return res.status(200).json({ message: 'Entry updated successfully' });
   } catch (error) {
     console.error('Error updating entry:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
 
 //start server
 

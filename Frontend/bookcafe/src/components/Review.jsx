@@ -31,7 +31,7 @@ const Review = () => {
       setApiResponse(response.data);
       setErr(null);
     } catch (error) {
-      console.error("Error adding user data:", error);
+      console.error(error.response.data.error);
       setApiResponse(null);
       setErr(err);
     }
