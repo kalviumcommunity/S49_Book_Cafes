@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import './Form.css'
 
 function Form() {
   const [success, setSuccess] = useState(false);
+  const [inputValue, setInputValue] = useState({})
+  const [check, setCheck] = useState(false)
+  const navigate = useNavigate()
 
   const {
     register,
@@ -14,14 +18,49 @@ function Form() {
 
   const onSub = (info) => {
     console.log(info);
+    setInputValue(info);
+    Object.entries(info).forEach(([key, value])=>{
+      document.cookie = `${key}=`+ encodeURIComponent(value)
+    })
+   
     setSuccess(true);
+    setTimeout(()=>{
+        navigate("/")
+    },3000)
   };
 
+  function getCookie(cookieName) {
+    const cookies = document.cookie.split(';'); // Split the cookie string into an array
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim(); // Remove any leading/trailing whitespace
+      // Check if the cookie starts with the name we're looking for
+      if (cookie.startsWith(cookieName + '=')) {
+        // Return the value of the cookie
+        return decodeURIComponent(cookie.substring(cookieName.length + 1));
+      }
+    }
+    return null;
+  }
+
+  useEffect(()=>{
+    
+    const cookiefirstname = getCookie('firstname') 
+    if(cookiefirstname){
+      setCheck(true)
+    }
+  },[])
+
+  const cookiefirstname = getCookie('firstname') 
+  const cookielastname = getCookie('lastname')
+  const cookieemail = getCookie('email')
+  const cookiepassword = getCookie('password')
+  console.log(cookiefirstname, cookieemail, cookielastname, cookiepassword)
+  
   return (
     <div className="main">
-      <form onSubmit={handleSubmit(onSub)}>
+      {!check?<form onSubmit={handleSubmit(onSub)}>
         <div>
-          {success && <p className="success">Registration Successful</p>}
+          {success && <p className="success">Registration Successful, Loding...</p>}
         </div>
 
         <div className="input-element">
@@ -98,7 +137,16 @@ function Form() {
             Register
           </button>
         </div>
-      </form>
+      </form>:<div><button onClick={()=>{
+           document.cookie = "firstname=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+           document.cookie = "lastname=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+           document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+           document.cookie = "password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+       
+           // Reset check state to false
+           setCheck(false);
+      }}>Log out</button></div>}
+      
     </div>
   );
 }
