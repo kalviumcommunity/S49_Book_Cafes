@@ -4,6 +4,7 @@ const bodyParser = require('body-parser'); // middleware for parsing request bod
 const app = express();
 const cors = require('cors')
 const Joi = require('joi')
+const jwt = require('jsonwebtoken')
 require('dotenv').config()
 app.use(cors({
   origin: '*', // Allow requests from any origin (you may want to restrict this to your frontend origin in production)
@@ -15,6 +16,9 @@ app.use(cors({
 
 const CafeModel = require('./models/CafeData.js')
 const UserReview = require('./models/UserReview.js')
+const LoginModel = require('./models/LoginData.js')
+
+const JWT_SECRET = process.env.JWT_SECRET || 'acessPermission';
 
 // Import CRUD routes
 const router = require('./routes.js');
@@ -72,7 +76,6 @@ app.get('/userData', async (req, res)=>{
   })
 
 //joi validation for the below post operation endpoint
-// app.use(express.json())
 const postSchema = Joi.object({
     Cafename: Joi.string().required(),
     Rating: Joi.number().required(),
@@ -135,6 +138,46 @@ app.put('/userData/:id', async(req, res)=>{
   } catch (error) {
     console.error('Error updating entry:', error);
     return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//auth endpoint for user login details
+app.get('/auth', async (req, res)=>{
+  try{
+    const userLogin = await LoginModel.find()
+    res.send(userLogin)
+  }catch (error) {
+    console.error("Error fetching entity list:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
+//joi validation for the below post operation endpoint - userLogin
+const loginPostSchema = Joi.object({
+  firstname: Joi.string().required(),
+  lastname: Joi.string().required(),
+  email: Joi.string().required(),
+  password: Joi.string().required()
+})
+
+//Endpoint for post operation to post an entity - userLogin
+app.post('/auth', async (req, res) => {
+const { error } = loginPostSchema.validate(req.body, {abortEarly: false});
+if (error) {
+  return res.status(400).json({ error: error.details.map((e) => e.message) });
+}
+
+const { firstname, lastname, email, password } = req.body;
+const newEntity = new LoginModel({ firstname, lastname, email, password });
+try {
+    const savedEntity = await newEntity.save();
+    // Generate JWT token
+    const token = jwt.sign({ userId: savedEntity._id }, JWT_SECRET, { expiresIn: '1h' });
+    // Send the JWT token as a response
+    return res.json({ token, savedEntity });
+  } catch (error) {
+    console.error("Error adding entity:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
