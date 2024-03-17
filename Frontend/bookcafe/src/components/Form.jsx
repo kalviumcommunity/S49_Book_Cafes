@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './Form.css'
+import axios from 'axios'
 
 function Form() {
   const [success, setSuccess] = useState(false);
@@ -16,17 +17,42 @@ function Form() {
     formState: { errors },
   } = useForm();
 
-  const onSub = (info) => {
-    console.log(info);
-    setInputValue(info);
-    Object.entries(info).forEach(([key, value])=>{
-      document.cookie = `${key}=`+ encodeURIComponent(value)
-    })
-   
-    setSuccess(true);
-    setTimeout(()=>{
-        navigate("/")
-    },3000)
+  useEffect(()=>{
+    axios.get("http://localhost:3000/auth", {
+  headers: {
+    Authorization: `Bearer ${getCookie('token')}`, // Include the JWT token from the cookie
+  },
+});
+
+  },[])
+
+  const onSub = async(info) => {
+    try {
+      const {firstname, lastname, email, password} = info
+      const response = await axios.post(
+        "http://localhost:3000/auth",{firstname, lastname, email, password},
+        {
+            headers: {
+                "abc":"anything",
+            }
+        });
+      const token = response.data.token;
+      document.cookie = `token=${token}; path='/;'`;
+      console.log("User data added:", response.data);
+      console.log(info);
+      console.log(getCookie('token'))
+      setInputValue(info);
+      Object.entries(info).forEach(([key, value])=>{
+        document.cookie = `${key}=`+ encodeURIComponent(value)
+      })
+    
+      setSuccess(true);
+      setTimeout(()=>{
+          navigate("/")
+      },3000)
+    } catch (error) {
+      console.error(error.response.data.error);
+    }
   };
 
   function getCookie(cookieName) {
@@ -43,7 +69,6 @@ function Form() {
   }
 
   useEffect(()=>{
-    
     const cookiefirstname = getCookie('firstname') 
     if(cookiefirstname){
       setCheck(true)
