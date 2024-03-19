@@ -9,6 +9,7 @@ function Form() {
   const [success, setSuccess] = useState(false);
   const [inputValue, setInputValue] = useState({})
   const [check, setCheck] = useState(false)
+  const [error, setError] = useState(null);
   const navigate = useNavigate()
 
   const {
@@ -19,11 +20,10 @@ function Form() {
 
   useEffect(()=>{
     axios.get("http://localhost:3000/auth", {
-  headers: {
-    Authorization: `Bearer ${getCookie('token')}`, // Include the JWT token from the cookie
-  },
-});
-
+    headers: {
+      Authorization: `Bearer ${getCookie('token')}`, // Include the JWT token from the cookie
+    },
+  });
   },[])
 
   const onSub = async(info) => {
@@ -36,11 +36,12 @@ function Form() {
                 "abc":"anything",
             }
         });
+      localStorage.setItem('firstNameCookie', info.firstname)
       const token = response.data.token;
       document.cookie = `token=${token}; path='/;'`;
       console.log("User data added:", response.data);
       console.log(info);
-      console.log(getCookie('token'))
+      console.log("Token:",getCookie('token'))
       setInputValue(info);
       Object.entries(info).forEach(([key, value])=>{
         document.cookie = `${key}=`+ encodeURIComponent(value)
@@ -52,6 +53,7 @@ function Form() {
       },3000)
     } catch (error) {
       console.error(error.response.data.error);
+      setError(error.response.data.error);
     }
   };
 
@@ -70,16 +72,20 @@ function Form() {
 
   useEffect(()=>{
     const cookiefirstname = getCookie('firstname') 
-    if(cookiefirstname){
-      setCheck(true)
-    }
+    const cookielastname = getCookie('lastname')
+    const cookieemail = getCookie('email')
+    const cookiepassword = getCookie('password')
+    console.log("Cookies: ",cookiefirstname, cookieemail, cookielastname, cookiepassword)
   },[])
 
-  const cookiefirstname = getCookie('firstname') 
-  const cookielastname = getCookie('lastname')
-  const cookieemail = getCookie('email')
-  const cookiepassword = getCookie('password')
-  console.log(cookiefirstname, cookieemail, cookielastname, cookiepassword)
+  useEffect(() => {
+    const cookieFirstname = getCookie('firstname');
+    if (cookieFirstname) {
+      setCheck(true);
+    } else {
+      setCheck(false);
+    }
+  }, []);
   
   return (
     <div className="main">
@@ -100,6 +106,7 @@ function Form() {
           {errors.firstname && errors.firstname.type === "required" && (
             <p className="error-msg">First Name is required</p>
           )}
+          {error && <p className="error-msg">{error}</p>}
         </div>
 
         <div className="input-element">
@@ -153,7 +160,7 @@ function Form() {
             <p className="error-msg">Password should have atmost 20 digits.</p>
           )}
           {errors.password && errors.password.type === "minLength" && (
-            <p className="error-msg">Password should msut have min of 5 digits.</p>
+            <p className="error-msg">Password should must have min of 5 digits.</p>
           )}
         </div>
         <div className="input-element registerbtn">
@@ -167,6 +174,7 @@ function Form() {
            document.cookie = "lastname=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
            document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
            document.cookie = "password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+           localStorage.removeItem('firstNameCookie');
        
            // Reset check state to false
            setCheck(false);

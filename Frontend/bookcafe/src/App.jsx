@@ -7,6 +7,7 @@ import Form from './components/Form';
 import Review from './components/Review';
 import Favourites from './components/Favourites';
 import UpdateEntity from './components/UpdateEntity';
+import CreatedBy from './components/CreatedBy';
 
 function App() {
   let [data, setData] = useState();
@@ -28,6 +29,7 @@ function App() {
           <Route path='/review' element={<Review/>}/>
           <Route path='/favourites' element={<Favourites/>}/>
           <Route path="/edit/:keyId" element={<UpdateEntity/>} />
+          <Route path="/created_by" element={<CreatedBy/>}/>
         </Routes>
       </Router>
     </div>

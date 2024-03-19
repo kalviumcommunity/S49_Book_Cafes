@@ -79,7 +79,8 @@ app.get('/userData', async (req, res)=>{
 const postSchema = Joi.object({
     Cafename: Joi.string().required(),
     Rating: Joi.number().required(),
-    Review: Joi.string().required()
+    Review: Joi.string().required(),
+    User: Joi.string().required()
 })
 
 //Endpoint for post operation to post an entity
@@ -89,8 +90,8 @@ app.post('/userData', async (req, res) => {
     return res.status(400).json({ error: error.details.map((e) => e.message) });
   }
 
-  const { Cafename, Rating, Review } = req.body;
-  const newEntity = new UserReview({ Cafename, Rating, Review });
+  const { Cafename, Rating, Review, User } = req.body;
+  const newEntity = new UserReview({ Cafename, Rating, Review, User });
   try {
     const savedEntity = await newEntity.save();
     return res.json(savedEntity);
@@ -99,9 +100,6 @@ app.post('/userData', async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
-
-
 
 //Endpoint for delete operation to delete an entity by it's id
 app.delete('/userData/:id', async(req, res)=>{
@@ -162,23 +160,29 @@ const loginPostSchema = Joi.object({
 
 //Endpoint for post operation to post an entity - userLogin
 app.post('/auth', async (req, res) => {
-const { error } = loginPostSchema.validate(req.body, {abortEarly: false});
-if (error) {
-  return res.status(400).json({ error: error.details.map((e) => e.message) });
-}
-
-const { firstname, lastname, email, password } = req.body;
-const newEntity = new LoginModel({ firstname, lastname, email, password });
-try {
-    const savedEntity = await newEntity.save();
-    // Generate JWT token
-    const token = jwt.sign({ userId: savedEntity._id }, JWT_SECRET, { expiresIn: '1h' });
-    // Send the JWT token as a response
-    return res.json({ token, savedEntity });
-  } catch (error) {
-    console.error("Error adding entity:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+  const { error } = loginPostSchema.validate(req.body, {abortEarly: false});
+  if (error) {
+    return res.status(400).json({ error: error.details.map((e) => e.message) });
   }
+
+  
+  const { firstname, lastname, email, password } = req.body;
+  const existingUser = await LoginModel.findOne({ firstname });
+  if (existingUser) {
+    // User with the provided first name already exists, send error response
+    return res.status(400).json({ error: 'User with this first name already exists' });
+  }
+  const newEntity = new LoginModel({ firstname, lastname, email, password });
+  try {
+      const savedEntity = await newEntity.save();
+      // Generate JWT token 
+      const token = jwt.sign({ userId: savedEntity._id }, JWT_SECRET, { expiresIn: '1h' });
+      // Send the JWT token as a response
+      return res.json({ token, savedEntity });
+    } catch (error) {
+      console.error("Error adding entity:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
 //start server
